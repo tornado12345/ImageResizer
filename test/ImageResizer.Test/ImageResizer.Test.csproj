@@ -60,6 +60,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ResizeOperationTests.cs" />
+    <Compile Include="TestDirectory.cs" />
+    <Compile Include="Views\TimeRemainingConverterTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ImageResizer\ImageResizer.csproj">
       <Project>{2be46397-4dfa-414c-9bd4-41e4bbf8cb34}</Project>
       <Name>ImageResizer</Name>
@@ -70,6 +75,23 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Test.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Test.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Test.tif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Test1.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Test2.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\SettingsTests.cs" />
