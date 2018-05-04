@@ -19,7 +19,7 @@ namespace ImageResizer.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -142,7 +142,7 @@ namespace ImageResizer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Width.
+        ///   Looks up a localized string similar to Selected width.
         /// </summary>
         public static string Advanced_FileNameToken3 {
             get {
@@ -151,11 +151,29 @@ namespace ImageResizer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Height.
+        ///   Looks up a localized string similar to Selected height.
         /// </summary>
         public static string Advanced_FileNameToken4 {
             get {
                 return ResourceManager.GetString("Advanced_FileNameToken4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actual width (pixels).
+        /// </summary>
+        public static string Advanced_FileNameToken5 {
+            get {
+                return ResourceManager.GetString("Advanced_FileNameToken5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actual height (pixels).
+        /// </summary>
+        public static string Advanced_FileNameToken6 {
+            get {
+                return ResourceManager.GetString("Advanced_FileNameToken6", resourceCulture);
             }
         }
         
@@ -241,7 +259,7 @@ namespace ImageResizer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to © 2016 Brice Lambson. All rights reserved..
+        ///   Looks up a localized string similar to © 2018 Brice Lambson. All rights reserved..
         /// </summary>
         public static string Copyright {
             get {

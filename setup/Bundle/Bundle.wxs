@@ -6,17 +6,18 @@
           Manufacturer="Brice Lambson"
           Name="Image Resizer for Windows"
           UpgradeCode="89a1bf6f-dddb-4adc-a307-0cc1ef2801bd"
-          Version="3.1.0.0">
+          Version="3.1.1.0">
     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
       <bal:WixStandardBootstrapperApplication LicenseFile="Ms-RL.rtf"
                                               LogoFile="ImageResizer.png"
+                                              ShowFilesInUse="yes"
                                               SuppressOptionsUI="yes" />
     </BootstrapperApplicationRef>
     <Chain>
       <PackageGroupRef Id="NetFx40ClientWeb"/>
       <MsiPackage SourceFile="$(var.Msi.TargetPath)" />
       <MsiPackage InstallCondition="VersionNT64"
-                  SourceFile="$(var.X64Msi.TargetPath)" />
+                  SourceFile="$(var.SolutionDir)setup\X64Msi\bin\x64\$(var.Configuration)\ImageResizer-x64.msi" />
     </Chain>
   </Bundle>
 </Wix>

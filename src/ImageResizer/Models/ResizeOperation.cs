@@ -50,17 +50,6 @@ namespace ImageResizer.Models
                     }
                 }
 
-                if (decoder.ColorContexts != null)
-                {
-                    try
-                    {
-                        encoder.ColorContexts = decoder.ColorContexts;
-                    }
-                    catch (InvalidOperationException)
-                    {
-                    }
-                }
-
                 if (decoder.Palette != null)
                     encoder.Palette = decoder.Palette;
 
@@ -71,7 +60,7 @@ namespace ImageResizer.Models
                             Transform(originalFrame),
                             /*thumbnail:*/ null,
                             (BitmapMetadata)originalFrame.Metadata,
-                            originalFrame.ColorContexts));
+                            colorContexts: null));
                 }
 
                 path = GetDestinationPath(encoder);
@@ -84,34 +73,27 @@ namespace ImageResizer.Models
 
             if (_settings.Replace)
             {
-                FileSystem.DeleteFile(_file, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                File.Move(path, _file);
+                var backup = GetBackupPath();
+                File.Replace(path, _file, backup, ignoreMetadataErrors: true);
+                FileSystem.DeleteFile(backup, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
             }
         }
 
         void ConfigureEncoder(BitmapEncoder encoder)
         {
-            var jpegEncoder = encoder as JpegBitmapEncoder;
-            if (jpegEncoder != null)
+            switch (encoder)
             {
+                case JpegBitmapEncoder jpegEncoder:
+                    jpegEncoder.QualityLevel = MathHelpers.Clamp(_settings.JpegQualityLevel, 1, 100);
+                    break;
 
-                jpegEncoder.QualityLevel = MathHelpers.Clamp(_settings.JpegQualityLevel, 1, 100);
+                case PngBitmapEncoder pngBitmapEncoder:
+                    pngBitmapEncoder.Interlace = _settings.PngInterlaceOption;
+                    break;
 
-                return;
-            }
-
-            var pngBitmapEncoder = encoder as PngBitmapEncoder;
-            if (pngBitmapEncoder != null)
-            {
-                pngBitmapEncoder.Interlace = _settings.PngInterlaceOption;
-
-                return;
-            }
-
-            var tiffEncoder = encoder as TiffBitmapEncoder;
-            if (tiffEncoder != null)
-            {
-                tiffEncoder.Compression = _settings.TiffCompressOption;
+                case TiffBitmapEncoder tiffEncoder:
+                    tiffEncoder.Compression = _settings.TiffCompressOption;
+                    break;
             }
         }
 
@@ -122,15 +104,15 @@ namespace ImageResizer.Models
             var width = _settings.SelectedSize.GetPixelWidth(originalWidth, source.DpiX);
             var height = _settings.SelectedSize.GetPixelHeight(originalHeight, source.DpiY);
 
-            if (_settings.IgnoreOrientation && originalWidth < originalHeight != (width < height))
+            if (_settings.IgnoreOrientation
+                && !_settings.SelectedSize.HasAuto
+                && _settings.SelectedSize.Unit != ResizeUnit.Percent
+                && originalWidth < originalHeight != (width < height))
             {
                 var temp = width;
                 width = height;
-                height = width;
+                height = temp;
             }
-
-            if (_settings.ShrinkOnly && (width > originalWidth || height > originalHeight))
-                return source;
 
             var scaleX = width / originalWidth;
             var scaleY = height / originalHeight;
@@ -145,6 +127,11 @@ namespace ImageResizer.Models
                 scaleX = Math.Max(scaleX, scaleY);
                 scaleY = scaleX;
             }
+
+            if (_settings.ShrinkOnly
+                && _settings.SelectedSize.Unit != ResizeUnit.Percent
+                && (scaleX >= 1 || scaleY >= 1))
+                return source;
 
             var scaledBitmap = new TransformedBitmap(source, new ScaleTransform(scaleX, scaleY));
             if (_settings.SelectedSize.Fit == ResizeFit.Fill
@@ -167,7 +154,7 @@ namespace ImageResizer.Models
 
             var supportedExtensions = encoder.CodecInfo.FileExtensions.Split(',');
             var extension = Path.GetExtension(_file);
-            if (!supportedExtensions.Contains(extension))
+            if (!supportedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
             {
                 extension = supportedExtensions.FirstOrDefault();
             }
@@ -177,11 +164,27 @@ namespace ImageResizer.Models
                 originalFileName,
                 _settings.SelectedSize.Name,
                 _settings.SelectedSize.Width,
-                _settings.SelectedSize.Height);
+                _settings.SelectedSize.Height,
+                encoder.Frames[0].PixelWidth,
+                encoder.Frames[0].PixelHeight);
             var path = Path.Combine(directory, fileName + extension);
             var uniquifier = 1;
             while (File.Exists(path))
                 path = Path.Combine(directory, fileName + " (" + uniquifier++ + ")" + extension);
+
+            return path;
+        }
+
+        string GetBackupPath()
+        {
+            var directory = Path.GetDirectoryName(_file);
+            var fileName = Path.GetFileNameWithoutExtension(_file);
+            var extension = Path.GetExtension(_file);
+
+            var path = Path.Combine(directory, fileName + ".bak" + extension);
+            var uniquifier = 1;
+            while (File.Exists(path))
+                path = Path.Combine(directory, fileName + " (" + uniquifier++ + ")" + ".bak" + extension);
 
             return path;
         }

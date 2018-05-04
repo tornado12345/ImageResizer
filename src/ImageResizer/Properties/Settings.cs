@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -13,9 +12,7 @@ namespace ImageResizer.Properties
         string _fileNameFormat;
 
         public Settings()
-        {
-            AllSizes = new AllSizesCollection(this);
-        }
+            => AllSizes = new AllSizesCollection(this);
 
         public IEnumerable<ResizeSize> AllSizes { get; }
 
@@ -27,17 +24,23 @@ namespace ImageResizer.Properties
                     .Replace("%1", "{0}")
                     .Replace("%2", "{1}")
                     .Replace("%3", "{2}")
-                    .Replace("%4", "{3}"));
+                    .Replace("%4", "{3}")
+                    .Replace("%5", "{4}")
+                    .Replace("%6", "{5}"));
 
         public ResizeSize SelectedSize
         {
-            get
-            {
-                return SelectedSizeIndex >= 0 && SelectedSizeIndex < Sizes.Count
+            get => SelectedSizeIndex >= 0 && SelectedSizeIndex < Sizes.Count
                     ? Sizes[SelectedSizeIndex]
                     : CustomSize;
+            set
+            {
+                var index = Sizes.IndexOf(value);
+                if (index == -1)
+                    index = Sizes.Count;
+
+                SelectedSizeIndex = index;
             }
-            set { throw new NotImplementedException(); }
         }
 
         string IDataErrorInfo.Error
@@ -146,9 +149,7 @@ namespace ImageResizer.Properties
                 int _index = -1;
 
                 public AllSizesEnumerator(AllSizesCollection list)
-                {
-                    _list = list;
-                }
+                    => _list = list;
 
                 public ResizeSize Current
                     => _list[_index];
